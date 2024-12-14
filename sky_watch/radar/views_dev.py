@@ -12,10 +12,12 @@ from .tools import Event, HEIGHT, WIDTH
 # Block for Developer #
 #######################
 
+# /dev/radar
 def radar_test_page(request):
     return render(request, "radar/radar_test.html")
 
 
+# /dev/data/clear
 def data_clear(request):
     """
     :param request:
@@ -31,6 +33,7 @@ def data_clear(request):
     return JsonResponse(event_info)
 
 
+# /dev/data/update
 def data_update(request):
     """
     :param request:
@@ -79,12 +82,13 @@ def data_update(request):
             angle=angle_right[i],
             radar=radar_right,
         )
-        sleep(1)
+        sleep(.5)
         print('RadarData create', i + 1)
         event.add(f"create RadarData left and right")
     return JsonResponse(event.get_data())
 
 
+# dev/get-coordinate/<int:angle_left>/<int:angle_right>
 def get_test_coordinate(request, angle_left, angle_right):
     """
     :test: get_test_coordinate(request, 45, 135) => {x: 600, y: 200} if WIDTH == 1200
@@ -105,3 +109,5 @@ def get_test_coordinate(request, angle_left, angle_right):
         #  HEIGHT - y оскільки початок координат в SVG знаходиться у лівому верхньому куті
         "y": HEIGHT - y,
     })
+
+# TODO: роут для передачі до ESP 32

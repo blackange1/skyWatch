@@ -1,34 +1,16 @@
-import math
-from time import sleep
-
 from django.shortcuts import render
 from django.http import JsonResponse
 
-from radar.models import ChannelMap, Radar, RadarData
-from .tools import Event, HEIGHT, WIDTH
+from radar.models import ChannelMap
+from .tools import get_coordinate
 
-
-def get_coordinate(angle_left, angle_right):
-    """
-    :test: get_coordinate(45, 135) => {x: 600, y: 200} if WIDTH == 1200
-    :param request: angle_left: кут лівого esp32, angle_right: кут правого esp32
-    :return: get x and y coordinates
-    """
-    # знаходимо k-коефіцієнт рівнянн y = k * x + c
-    k1 = math.tan(math.pi / 180 * angle_left)
-    k2 = math.tan(math.pi / 180 * angle_right)
-    # знаходимо c2 рівняня y = k2 * x + c2
-    # враховуючи, що пряма проходить через точеку (0, WIDTH)
-    c2 = -k2 * WIDTH
-    # розв'я зуємо систему рівнянь y = k1 * x та y = k2 * x + c2 шляхлм підстановки
-    x = c2 / (k1 - k2)
-    y = k1 * x
-    return {
-        "x": x,
-        #  HEIGHT - y оскільки початок координат в SVG знаходиться у лівому верхньому куті
-        "y": HEIGHT - y,
+def index(request):
+    list_channel_map = ChannelMap.objects.all()
+    print(list_channel_map)
+    context = {
+        'list_channel_map': list_channel_map,
     }
-
+    return render(request, 'radar/index.html', context=context)
 
 def api_coordinate(request, channel):
     """

@@ -3,6 +3,7 @@ from . import views_dev, views_main
 
 urlpatterns = [
     # prod
+    path('', views_main.index, name='index'),
     path('radar/<str:channel>', views_main.radar, name='radar'),
     path('api/radar/<str:channel>', views_main.api_coordinate, name='api_coordinate'),
     # for developer
