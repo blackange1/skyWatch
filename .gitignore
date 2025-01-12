@@ -1,3 +1,4 @@
 .idea
 .venv
 sky_watch/db.sqlite3
+*.pyc

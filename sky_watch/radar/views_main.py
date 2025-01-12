@@ -1,8 +1,11 @@
+import json
+
 from django.shortcuts import render
 from django.http import JsonResponse
 
-from radar.models import ChannelMap
+from radar.models import ChannelMap, RadarData, Radar
 from .tools import get_coordinate
+
 
 def index(request):
     list_channel_map = ChannelMap.objects.all()
@@ -11,6 +14,7 @@ def index(request):
         'list_channel_map': list_channel_map,
     }
     return render(request, 'radar/index.html', context=context)
+
 
 def api_coordinate(request, channel):
     """
@@ -58,3 +62,37 @@ def radar(request, channel):
         "name_space": name_space,
     }
     return render(request, "radar/radar.html", context=context)
+
+
+def api_radar_data(request):
+    if request.method == "POST":
+        body = request.body
+        data = json.loads(body.decode())
+        radar_name = data.get("radar", "")
+        radar = Radar.objects.filter(name=radar_name).first()
+        if radar:
+            angle = data.get("angle", None)
+            if angle is None:
+                return JsonResponse({
+                    "status": "ok",
+                    "error": "Не вкахано кут"
+                })
+            RadarData.objects.create(
+                angle=angle,
+                radar=radar,
+            )
+            return JsonResponse({
+                "status": "ok",
+            })
+        return JsonResponse({
+            "status": "ok",
+            "error": "ESP-32 з таким іменем не існує"
+        })
+    return JsonResponse({
+        "status": "ok",
+        "info": "для перередачі даних використовуй метод POST, а інформацію передавай у body",
+        "exemple body": {
+            "angle": 45,
+            "radar": "esp32-v1"
+        }
+    })
